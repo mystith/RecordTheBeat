@@ -48,14 +48,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\DBeatmapInfo.cs" />
-    <Compile Include="Data\HitCircle.cs" />
+    <Compile Include="Data\HitObjects\HitsoundExtras.cs" />
+    <Compile Include="Data\HitObjects\HitCircle.cs" />
     <Compile Include="Data\HPValue.cs" />
-    <Compile Include="Data\IntDoublePair.cs" />
+    <Compile Include="Data\HitObjects\IHitObject.cs" />
+    <Compile Include="Data\Basic\IntDoublePair.cs" />
+    <Compile Include="Data\Basic\IntPair.cs" />
     <Compile Include="Data\Movement.cs" />
-    <Compile Include="Data\Slider.cs" />
-    <Compile Include="Data\Spinner.cs" />
-    <Compile Include="Data\TimingPoint.cs" />
+    <Compile Include="Data\HitObjects\Slider.cs" />
+    <Compile Include="Data\HitObjects\Spinner.cs" />
+    <Compile Include="Data\HitObjects\TimingPoint.cs" />
     <Compile Include="Enums\Gamemode.cs" />
+    <Compile Include="Enums\HitObjects\HitObjectType.cs" />
+    <Compile Include="Enums\HitObjects\HitSoundType.cs" />
     <Compile Include="Enums\KeyInfo.cs" />
     <Compile Include="Enums\Mods.cs" />
     <Compile Include="Parsing\Beatmap.cs" />
@@ -69,5 +74,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

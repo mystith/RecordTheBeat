@@ -1,4 +1,4 @@
-﻿namespace RecordTheBeat.Data
+﻿namespace RecordTheBeat.Data.Basic
 {
     public class IntDoublePair
     {

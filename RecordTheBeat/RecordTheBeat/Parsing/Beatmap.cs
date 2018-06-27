@@ -1,5 +1,8 @@
-﻿using RecordTheBeat.Enums;
+﻿using RecordTheBeat.Data.Basic;
+using RecordTheBeat.Data.HitObjects;
+using RecordTheBeat.Enums;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace RecordTheBeat.Parsing
 {
@@ -36,8 +39,26 @@ namespace RecordTheBeat.Parsing
         public double CircleSize { get; }
         public double OverallDifficulty { get; }
         public double ApproachRate { get; }
+        public double SliderMultiplier { get; }
+        public double SliderTickRate { get; }
         #endregion
+        #region Events
+        public string Background { get; }
+        public List<IntPair> Breaks { get; }
+        #endregion
+        #region Colors
+        public List<Color> ComboColors { get; }
+        public Color SliderBody { get; }
+        public Color SliderTrackOverride { get; }
+        public Color SliderBorder { get; }
+        #endregion
+        #region Game
+        public List<TimingPoint> TimingPoints { get; }
 
+        #endregion
+        
+
+        
         public Beatmap(string osuFile)
         {
             
