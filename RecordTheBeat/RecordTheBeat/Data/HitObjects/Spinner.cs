@@ -1,6 +1,6 @@
 ﻿namespace RecordTheBeat.Data.HitObjects
 {
-    public class Spinner
+    public class Spinner : HitObject
     {
         public int EndTime { get; set; }
     }

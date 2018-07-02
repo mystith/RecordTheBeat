@@ -4,15 +4,15 @@ namespace RecordTheBeat.Data.HitObjects
 {
     public class HitObject
     {
-        int X { get; set; }
-        int Y { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
-        int Time { get; set; }
+        public int Time { get; set; }
 
-        HitObjectType ObjectType { get; set; }
+        public HitObjectType ObjectType { get; set; }
 
-        HitSoundType Hitsound { get; set; }
+        public HitSoundType Hitsound { get; set; }
 
-        HitsoundExtras Extras { get; set; }
+        public HitsoundExtras Extras { get; set; }
     }
 }

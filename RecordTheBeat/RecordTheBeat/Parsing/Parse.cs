@@ -1,4 +1,6 @@
 ﻿using RecordTheBeat.Data;
+using RecordTheBeat.Data.Basic;
+using RecordTheBeat.Data.HitObjects;
 using System;
 using System.IO;
 using System.Text;
@@ -55,11 +57,6 @@ namespace RecordTheBeat.Parsing
             }
 
             return Encoding.UTF8.GetString(br.ReadBytes(result));
-        }
-
-        public static TimingPoint ParseTimingPoint(BinaryReader br)
-        {
-            return new TimingPoint() { BPM = BitConverter.ToDouble(br.ReadBytes(8), 0), Offset = BitConverter.ToDouble(br.ReadBytes(8), 0), Inherited = br.ReadByte() == 1 };
         }
 
         public static IntDoublePair ParseIntDouble(BinaryReader br)

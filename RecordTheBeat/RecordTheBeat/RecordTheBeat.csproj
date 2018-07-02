@@ -47,11 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Basic\DoublePair.cs" />
     <Compile Include="Data\DBeatmapInfo.cs" />
     <Compile Include="Data\HitObjects\HitsoundExtras.cs" />
     <Compile Include="Data\HitObjects\HitCircle.cs" />
+    <Compile Include="Data\HitObjects\HoldNote.cs" />
     <Compile Include="Data\HPValue.cs" />
-    <Compile Include="Data\HitObjects\IHitObject.cs" />
+    <Compile Include="Data\HitObjects\HitObject.cs" />
     <Compile Include="Data\Basic\IntDoublePair.cs" />
     <Compile Include="Data\Basic\IntPair.cs" />
     <Compile Include="Data\Movement.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="Enums\Gamemode.cs" />
     <Compile Include="Enums\HitObjects\HitObjectType.cs" />
     <Compile Include="Enums\HitObjects\HitSoundType.cs" />
+    <Compile Include="Enums\HitObjects\SliderType.cs" />
     <Compile Include="Enums\KeyInfo.cs" />
     <Compile Include="Enums\Mods.cs" />
     <Compile Include="Parsing\Beatmap.cs" />

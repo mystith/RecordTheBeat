@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RecordTheBeat.Data.HitObjects
 {
-    public class Slider
+    public class Slider : HitObject
     {
         public SliderType Type { get; set; }
         public List<DoublePair> Points { get; set; }
