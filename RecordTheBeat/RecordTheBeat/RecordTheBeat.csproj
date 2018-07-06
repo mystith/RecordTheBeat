@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Basic\DoublePair.cs" />
+    <Compile Include="Data\Basic\Vector2D.cs" />
     <Compile Include="Data\DBeatmapInfo.cs" />
     <Compile Include="Data\HitObjects\HitsoundExtras.cs" />
     <Compile Include="Data\HitObjects\HitCircle.cs" />
@@ -55,7 +55,7 @@
     <Compile Include="Data\HPValue.cs" />
     <Compile Include="Data\HitObjects\HitObject.cs" />
     <Compile Include="Data\Basic\IntDoublePair.cs" />
-    <Compile Include="Data\Basic\IntPair.cs" />
+    <Compile Include="Data\Basic\Vector2.cs" />
     <Compile Include="Data\Movement.cs" />
     <Compile Include="Data\HitObjects\Slider.cs" />
     <Compile Include="Data\HitObjects\Spinner.cs" />

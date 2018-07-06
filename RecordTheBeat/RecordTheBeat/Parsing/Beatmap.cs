@@ -49,7 +49,7 @@ namespace RecordTheBeat.Parsing
         #endregion
         #region Events
         public string Background { get; }
-        public List<IntPair> Breaks { get; }
+        public List<Vector2> Breaks { get; }
         #endregion
         #region Colors
         public List<Color> ComboColors { get; }
@@ -67,6 +67,7 @@ namespace RecordTheBeat.Parsing
         public Beatmap(string osuFile)
         {
             List<string> osuFileLines = File.ReadAllLines(osuFile).ToList();
+            ComboColors = new List<Color>();
 
             foreach (string str in osuFileLines)
             {
@@ -110,7 +111,7 @@ namespace RecordTheBeat.Parsing
                 }
             }
 
-            IEnumerable<string> timingPoints = osuFileLines.SkipWhile(o => !o.ToLower().Contains("timingpoints")).TakeWhile(o => !o.ToLower().Contains("hitobjects"));
+            IEnumerable<string> timingPoints = osuFileLines.SkipWhile(o => !o.ToLower().Contains("timingpoints")).TakeWhile(o => !o.ToLower().Contains("col"));
 
             TimingPoints = new List<TimingPoint>();
             foreach (string timingPoint in timingPoints)
@@ -165,26 +166,184 @@ namespace RecordTheBeat.Parsing
                 {
                     Spinner spinner = (Spinner)ho;
                     spinner.EndTime = int.Parse(split[5]);
+
+                    Spinners.Add(spinner);
                 } else if(ho.ObjectType == HitObjectType.Slider) {
                     Slider slider = (Slider)ho;
-                    slider.Points.Add(new DoublePair() { A = slider.X, B = slider.Y });
+                    slider.Points.Add(new Vector2D(slider.X, slider.Y));
 
                     string[] sliderInfo = split[5].Split('|');
                     string type = sliderInfo[0];
 
                     slider.Type = type == "L" ? SliderType.Linear : (type == "P" ? SliderType.Perfect : (type == "B" ? SliderType.Bezier : SliderType.Catmull));
 
-                    IEnumerable<IntPair> curvePoints = sliderInfo.Skip(1).Select(o => o.Split(':')).Select(o => new IntPair() { A = int.Parse(o[0]), B = int.Parse(o[1]) });
+                    slider.CurvePoints = sliderInfo.Skip(1).Select(o => o.Split(':')).Select(o => new Vector2(int.Parse(o[0]), int.Parse(o[1])));
                     
                     if(slider.Type == SliderType.Linear)
                     {
-                        slider.Points.Add(curvePoints.First().ToDoublePair());
+                        slider.Points.Add(slider.CurvePoints.First().ToDoublePair());
                     } else if(slider.Type == SliderType.Perfect)
                     {
-
+                        slider.Points.AddRange(PerfectCurve(slider));
+                    } else if (slider.Type == SliderType.Bezier)
+                    {
+                        slider.Points.AddRange(BezierCurve(slider));
+                    } else if (slider.Type == SliderType.Catmull)
+                    {
+                        slider.Points.AddRange(CatmullCurve(slider));
                     }
+
+                    Sliders.Add(slider);
                 }
             }
+        }
+
+        public List<Vector2D> CatmullCurve(Slider slider) //Actual catmull calculations from https://github.com/SneakyBrian/Catmull-Rom-Sample
+        {
+            int count = slider.CurvePoints.Count();
+            if (count < 4)
+                return BezierCurve(slider);
+
+            List<Vector2D> splinePoints = new List<Vector2D>();
+
+            for (int i = 0; i < count - 3; i++)
+            {
+                for (int j = 0; j < count; j++)
+                {
+                    splinePoints.Add(PointOnCurve(slider.CurvePoints.ElementAt(i), slider.CurvePoints.ElementAt(i + 1), slider.CurvePoints.ElementAt(i + 2), slider.CurvePoints.ElementAt(i + 3), (1f / count) * j));
+                }
+            }
+
+            splinePoints.Add(slider.CurvePoints.ElementAt(count - 2).ToDoublePair());
+
+            return splinePoints;
+        }
+
+        public static Vector2D PointOnCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, double t)
+        {
+            Vector2D ret = new Vector2D(0, 0);
+
+            double t2 = t * t;
+            double t3 = t2 * t;
+
+            ret.X = 0.5f * ((2.0f * p1.X) +
+            (-p0.X + p2.X) * t +
+            (2.0f * p0.X - 5.0f * p1.X + 4 * p2.X - p3.X) * t2 +
+            (-p0.X + 3.0f * p1.X - 3.0f * p2.X + p3.X) * t3);
+
+            ret.Y = 0.5f * ((2.0f * p1.Y) +
+            (-p0.Y + p2.Y) * t +
+            (2.0f * p0.Y - 5.0f * p1.Y + 4 * p2.Y - p3.Y) * t2 +
+            (-p0.Y + 3.0f * p1.Y - 3.0f * p2.Y + p3.Y) * t3);
+
+            return ret;
+        }
+
+        private List<Vector2D> BezierCurve(Slider slider) //Actual bezier calculations from StackOverflow
+        {
+            List<List<Vector2>> realCurvePoints = new List<List<Vector2>>();
+
+            int curvePointsCount = slider.CurvePoints.Count();
+
+            List<Vector2> buffer = new List<Vector2>();
+            for (int i = 0; i < curvePointsCount; i++)
+            {
+                Vector2 item = slider.CurvePoints.ElementAt(i);
+                buffer.Add(item);
+
+                if(curvePointsCount > i && item == slider.CurvePoints.ElementAt(i + 1))
+                {
+                    realCurvePoints.Add(buffer);
+                    buffer.Clear();
+                }
+            }
+
+            List<Vector2D> output = new List<Vector2D>();
+            foreach (List<Vector2> bezier in realCurvePoints)
+            {
+                Vector2D[] points = new Vector2D[bezier.Count + 1];
+                for (int i = 0; i <= bezier.Count; i++)
+                {
+                    double t = (double)i / bezier.Count;
+                    points[i] = GetBezierPoint(t, bezier, 0, bezier.Count);
+                }
+
+                output.AddRange(points);
+            }
+
+            return output;
+        }
+
+        private Vector2D GetBezierPoint(double t, List<Vector2> controlPoints, int index, int count)
+        {
+            if (count == 1)
+                return controlPoints[index].ToDoublePair();
+            var P0 = GetBezierPoint(t, controlPoints, index, count - 1);
+            var P1 = GetBezierPoint(t, controlPoints, index + 1, count - 1);
+            return new Vector2D((1 - t) * P0.X + t * P1.X, (1 - t) * P0.Y + t * P1.Y);
+        }
+
+        private List<Vector2D> PerfectCurve(Slider slider)
+        {
+            if(slider.CurvePoints.Count() > 3)
+                return BezierCurve(slider);
+
+            Vector2D a = new Vector2D(slider.X, slider.Y);
+            Vector2D b = slider.CurvePoints.First().ToDoublePair();
+            Vector2D c = slider.CurvePoints.Last().ToDoublePair();
+
+            double d = pythagorean(b, c);
+            double e = pythagorean(a, c);
+            double f = pythagorean(a, b);
+
+            double aSq = d * d;
+            double bSq = e * e;
+            double cSq = f * f;
+
+            if (AlmostEquals(aSq, 0) || AlmostEquals(bSq, 0) || AlmostEquals(cSq, 0))
+                return BezierCurve(slider);
+
+            double s = aSq * (bSq + cSq - aSq);
+            double t = bSq * (aSq + cSq - bSq);
+            double u = cSq * (aSq + bSq - cSq);
+
+            double sum = s + t + u;
+
+            if (AlmostEquals(sum, 0))
+                return BezierCurve(slider);
+
+            Vector2D centre = (a * s + b * t + c * u) / sum;
+            Vector2D dA = a - centre;
+            Vector2D dC = c - centre;
+
+            double r = dA.Length();
+
+            double thetaStart = Math.Atan2(dA.Y, dA.X);
+            double thetaEnd = Math.Atan2(dC.Y, dC.X);
+
+            List<Vector2D> points = new List<Vector2D>();
+            for(double theta = Math.Min(thetaStart, thetaEnd); theta < Math.Max(thetaStart, thetaEnd); theta += 1)
+            {
+                points.Add(new Vector2D(Math.Cos(theta) * r, Math.Sin(theta)));
+            }
+            return points;
+        }
+
+        private double pythagorean(Vector2D a, Vector2D b)
+        {
+            double lengthA = Math.Abs(a.X - b.X);
+            double lengthB = Math.Abs(a.Y - b.Y);
+
+            return lengthA * lengthA + lengthB * lengthB;
+        }
+
+        private bool AlmostEquals(double a, double b)
+        {
+            if (Math.Abs(a - b) < 0.01)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using RecordTheBeat.Data;
+using RecordTheBeat.Data.Basic;
 
 namespace RecordTheBeat.Parsing
 {
@@ -13,13 +14,15 @@ namespace RecordTheBeat.Parsing
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            using (FileStream file = new FileStream(inputFile, FileMode.Open))
+            if(!File.Exists(String.Concat(inputFile, ".TEMP"))) File.Copy(inputFile, String.Concat(inputFile, ".TEMP"));
+            using (FileStream file = new FileStream(String.Concat(inputFile, ".TEMP"), FileMode.Open))
             {
                 file.SetLength(Math.Max(0, file.Length - 4));
 
                 using (BinaryReader br = new BinaryReader(file))
                 {
-                    br.BaseStream.Position += 17;
+                    int version = Parse.ParseInteger(br);
+                    br.BaseStream.Position += 13;
                     Parse.SkipString(br);
                     int numMaps = Parse.ParseInteger(br);
 
@@ -29,23 +32,49 @@ namespace RecordTheBeat.Parsing
                         long index = br.BaseStream.Position;
                         DBeatmapInfo bm = new DBeatmapInfo
                         {
-                            Size = BitConverter.ToInt32(br.ReadBytes(4), 0),
-                            ArtistName = Parse.ParseString(br),
-                            ArtistUnicode = Parse.ParseString(br),
-                            Title = Parse.ParseString(br),
-                            TitleUnicode = Parse.ParseString(br),
-                            Creator = Parse.ParseString(br),
-                            Difficulty = Parse.ParseString(br),
-                            AudioName = Parse.ParseString(br),
-                            MD5Hash = Parse.ParseString(br),
-                            OSUFile = Parse.ParseString(br)
+                            Size = Parse.ParseInteger(br)
                         };
+
+                        for (int _ = 0; _ < 7; _++) Parse.SkipString(br);
+
+                        bm.MD5Hash = Parse.ParseString(br);
+                        bm.OSUFile = Parse.ParseString(br);
+
+                        br.BaseStream.Position += 15;
+
+                        if(version < 20140609)
+                        {
+                            br.BaseStream.Position += 12;
+                        } else
+                        {
+                            br.BaseStream.Position += 24;
+                        }
+
+                        if (version >= 20140609)
+                        {
+                            for (int _ = 0; _ < 4; _++)
+                            {
+                                int brbr = Parse.ParseInteger(br);
+                                br.BaseStream.Position += brbr * 14;
+                            }
+                        }
+
+                        br.BaseStream.Position += 12;
+                        br.BaseStream.Position += Parse.ParseInteger(br) * 17 + 27;
+                        for (int _ = 0; _ < 2; _++) Parse.SkipString(br);
+                        br.BaseStream.Position += 2;
+                        
+                        Parse.SkipString(br);
+                        br.BaseStream.Position += 10;
+
+                        bm.FolderName = Parse.ParseString(br);
                         Beatmaps.Add(bm);
                         br.BaseStream.Position = index + bm.Size + 4;
                     }
                 }
             }
 
+            File.Delete(String.Concat(inputFile, ".TEMP"));
             stopwatch.Stop();
             Console.WriteLine($"Finished parsing database file, took { stopwatch.Elapsed.TotalMilliseconds } ms");
         }

@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using RecordTheBeat.Data;
 using RecordTheBeat.Parsing;
 using System;
 using System.Collections.Generic;
@@ -43,36 +44,40 @@ namespace RecordTheBeat
                 osuFolder = String.Join("=", File.ReadAllLines("config.ini")[0].Split('=').Skip(1));
             }
 
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (true)//ofd.ShowDialog() == DialogResult.OK)
             {
+                ofd.FileName = "C:/replay.osr";
                 Replay replay = new Replay(ofd.FileName);
 
                 Beatmap map = null;
 
                 Database db = new Database(string.Concat(osuFolder, "/osu!.db"));
-                map = new Beatmap(db.Beatmaps.First(o => o.MD5Hash == replay.BeatmapMD5).OSUFile);
-                
-                //int length = 0;
-                //int setID = 0;
 
-                //Console.WriteLine("Drawing frames..." + length + " - " + setID);
+                DBeatmapInfo info = db.Beatmaps.First(o => o.MD5Hash == replay.BeatmapMD5);
+                string beatmapPath = String.Concat(osuFolder, "\\Songs\\", info.FolderName, "\\", info.OSUFile);
+                Console.WriteLine(beatmapPath);
+                map = new Beatmap(beatmapPath);
 
-                /*Mp3FileReader file = new Mp3FileReader()
-                PrivateFontCollection privateFontCollection = new PrivateFontCollection();
-                privateFontCollection.AddFontFile("Roboto-Regular.ttf");
+                Console.WriteLine("Drawing frames...");
 
-                Font boldfont = new Font(privateFontCollection.Families[0], 24, FontStyle.Regular);
+                Mp3FileReader file = new Mp3FileReader(String.Concat(String.Join("\\", beatmapPath.Split('\\').Reverse().Skip(1).Reverse()), "\\", map.AudioFilename));
+                Console.WriteLine(file.TotalTime);
 
-                int frameCount = 780;
-                for (int i = 0; i < frameCount; i++)
-                {
-                    using (Bitmap b = new Bitmap(1920, 1080))
-                    {
-                        using (Graphics g = Graphics.FromImage(b))
-                        {
-                        }
-                    }
-                }*/
+                //PrivateFontCollection privateFontCollection = new PrivateFontCollection();
+                //privateFontCollection.AddFontFile("Roboto-Regular.ttf");
+
+                //Font boldfont = new Font(privateFontCollection.Families[0], 24, FontStyle.Regular);
+
+                //int frameCount = 780;
+                //for (int i = 0; i < frameCount; i++)
+                //{
+                //    using (Bitmap b = new Bitmap(1920, 1080))
+                //    {
+                //        using (Graphics g = Graphics.FromImage(b))
+                //        {
+                //        }
+                //    }
+                //}
             }
             Console.ReadLine();
         }

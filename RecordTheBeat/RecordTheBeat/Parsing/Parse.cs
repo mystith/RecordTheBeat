@@ -62,9 +62,9 @@ namespace RecordTheBeat.Parsing
         public static IntDoublePair ParseIntDouble(BinaryReader br)
         {
             br.BaseStream.Position++;
-            IntDoublePair res = new IntDoublePair() { A = BitConverter.ToInt32(br.ReadBytes(4), 0) };
+            IntDoublePair res = new IntDoublePair(BitConverter.ToInt32(br.ReadBytes(4), 0), 0);
             br.BaseStream.Position++;
-            res.B = BitConverter.ToDouble(br.ReadBytes(8), 0);
+            res.Y = BitConverter.ToDouble(br.ReadBytes(8), 0);
             return res;
         }
 
