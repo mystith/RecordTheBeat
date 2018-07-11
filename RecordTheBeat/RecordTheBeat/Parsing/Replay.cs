@@ -38,7 +38,7 @@ namespace RecordTheBeat.Parsing
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             string temporary = "";
-            using (FileStream file = new FileStream(inputFile, FileMode.Open))
+            using (MemoryStream file = new MemoryStream(File.ReadAllBytes(inputFile)))
             {
                 using (BinaryReader br = new BinaryReader(file))
                 {

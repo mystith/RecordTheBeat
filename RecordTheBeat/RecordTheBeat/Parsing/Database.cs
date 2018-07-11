@@ -15,11 +15,8 @@ namespace RecordTheBeat.Parsing
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            if(!File.Exists(String.Concat(inputFile, ".TEMP"))) File.Copy(inputFile, String.Concat(inputFile, ".TEMP"));
-            using (FileStream file = new FileStream(String.Concat(inputFile, ".TEMP"), FileMode.Open))
+            using (MemoryStream file = new MemoryStream(File.ReadAllBytes(inputFile)))
             {
-                file.SetLength(Math.Max(0, file.Length - 4));
-
                 using (BinaryReader br = new BinaryReader(file))
                 {
                     int version = Parse.ParseInteger(br);
@@ -43,10 +40,11 @@ namespace RecordTheBeat.Parsing
 
                         br.BaseStream.Position += 15;
 
-                        if(version < 20140609)
+                        if (version < 20140609)
                         {
                             br.BaseStream.Position += 12;
-                        } else
+                        }
+                        else
                         {
                             br.BaseStream.Position += 24;
                         }
@@ -64,7 +62,7 @@ namespace RecordTheBeat.Parsing
                         br.BaseStream.Position += Parse.ParseInteger(br) * 17 + 27;
                         for (int _ = 0; _ < 2; _++) Parse.SkipString(br);
                         br.BaseStream.Position += 2;
-                        
+
                         Parse.SkipString(br);
                         br.BaseStream.Position += 10;
 
