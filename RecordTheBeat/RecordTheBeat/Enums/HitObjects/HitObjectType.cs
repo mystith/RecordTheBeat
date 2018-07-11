@@ -1,5 +1,8 @@
-﻿namespace RecordTheBeat.Enums.HitObjects
+﻿using System;
+
+namespace RecordTheBeat.Enums.HitObjects
 {
+    [Flags]
     public enum HitObjectType
     {
         Circle = 1,

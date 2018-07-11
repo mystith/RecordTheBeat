@@ -4,6 +4,7 @@ using System.IO;
 using System.Diagnostics;
 using RecordTheBeat.Data;
 using RecordTheBeat.Data.Basic;
+using System.Linq;
 
 namespace RecordTheBeat.Parsing
 {
@@ -76,7 +77,6 @@ namespace RecordTheBeat.Parsing
 
             File.Delete(String.Concat(inputFile, ".TEMP"));
             stopwatch.Stop();
-            Console.WriteLine($"Finished parsing database file, took { stopwatch.Elapsed.TotalMilliseconds } ms");
         }
     }
 }

@@ -29,6 +29,9 @@ namespace RecordTheBeat.Parsing
         public long Timestamp { get; }
         public int LengthOfReplay { get; }
         public IEnumerable<Movement> ReplayData { get; }
+        public string Rank { get; }
+        public double Accuracy { get; }
+        public double TotalPP { get; set; }
 
         public Replay(string inputFile)
         {
@@ -63,11 +66,43 @@ namespace RecordTheBeat.Parsing
                 }
             }
 
+            Accuracy = ((Hit50 * 50d) + (Hit100 * 100d) + (Hit300 * 300d)) / (300d * (Misses + Hit50 + Hit100 + Hit300)) * 100;
+
+            double total = Hit300 + Hit100 + Hit50 + Misses;
+            double percent300 = Hit300 / total;
+            double percent100 = Hit100 / total;
+            double percent50 = Hit50 / total;
+
+            if (Hit300 == total)
+            {
+                Rank = "SS";
+            }
+            else if (percent300 > 0.9 && percent50 < 0.01 && Misses == 0)
+            {
+                Rank = "S";
+            }
+            else if ((percent300 > 0.8 && Misses == 0) || percent300 > 0.9)
+            {
+                Rank = "A";
+            }
+            else if ((percent300 > 0.7 && Misses == 0) || percent300 > 0.8)
+            {
+                Rank = "B";
+            }
+            else if (percent300 > 0.6)
+            {
+                Rank = "C";
+            }
+            else
+            {
+                Rank = "D";
+            }
+
             var proc = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "7za.exe",
+                    FileName = "Utilities/7za.exe",
                     Arguments = $"e { temporary }",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -83,7 +118,6 @@ namespace RecordTheBeat.Parsing
             File.Delete($"{ temporary }~");
 
             stopwatch.Stop();
-            Console.WriteLine($"Finished parsing replay, took { stopwatch.Elapsed.TotalMilliseconds } ms");
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿namespace RecordTheBeat.Enums
+﻿using System;
+
+namespace RecordTheBeat.Enums
 {
+    [Flags]
     public enum KeyInfo
     {
         M1 = 1,

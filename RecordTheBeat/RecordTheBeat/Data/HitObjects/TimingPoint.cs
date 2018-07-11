@@ -2,7 +2,7 @@
 {
     public class TimingPoint
     {
-        public int Offset { get; set; }
+        public double Offset { get; set; }
         public double MillisPerBeat { get; set; }
         public int Meter { get; set; }
         public int SampleSet { get; set; }

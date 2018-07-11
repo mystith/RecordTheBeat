@@ -7,6 +7,9 @@ using System.Linq;
 using System.IO;
 using RecordTheBeat.Enums.HitObjects;
 using System;
+using System.Diagnostics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace RecordTheBeat.Parsing
 {
@@ -62,11 +65,20 @@ namespace RecordTheBeat.Parsing
         public List<HitCircle> HitCircles { get; }
         public List<Slider> Sliders { get; }
         public List<Spinner> Spinners { get; }
+
+        public int MaxCombo { get; }
+        public int FirstObject { get; }
+
+        public double TotalPP { get; }
         #endregion
 
         public Beatmap(string osuFile)
         {
             List<string> osuFileLines = File.ReadAllLines(osuFile).ToList();
+
+            HitCircles = new List<HitCircle>();
+            Sliders = new List<Slider>();
+            Spinners = new List<Spinner>();
             ComboColors = new List<Color>();
 
             foreach (string str in osuFileLines)
@@ -77,7 +89,7 @@ namespace RecordTheBeat.Parsing
                 string[] split = str.Split(':');
                 switch (split[0].ToLower())
                 {
-                    case "audiofilename": AudioFilename = split[1]; continue;
+                    case "audiofilename": AudioFilename = new String(split[1].Skip(1).ToArray()); continue;
                     case "audioleadin": AudioLeadIn = int.Parse(split[1]); continue;
                     case "previewtime": PreviewTime = int.Parse(split[1]); continue;
                     case "countdown": Countdown = split[1].Contains("1"); continue;
@@ -111,7 +123,12 @@ namespace RecordTheBeat.Parsing
                 }
             }
 
-            IEnumerable<string> timingPoints = osuFileLines.SkipWhile(o => !o.ToLower().Contains("timingpoints")).TakeWhile(o => !o.ToLower().Contains("col"));
+            int index = osuFileLines.IndexOf(osuFileLines.Where(o => o.ToLower().Equals("//background and video events")).First()) + 1;
+
+            if (osuFileLines.ElementAt(index).Contains("\""))
+                Background = osuFileLines[index].Split('"')[1];
+
+            IEnumerable<string> timingPoints = osuFileLines.SkipWhile(o => !o.ToLower().Contains("timingpoints")).TakeWhile(o => !o.ToLower().Contains("col") && !o.ToLower().Contains("hitobjects"));
 
             TimingPoints = new List<TimingPoint>();
             foreach (string timingPoint in timingPoints)
@@ -122,7 +139,7 @@ namespace RecordTheBeat.Parsing
 
                 TimingPoint tp = new TimingPoint
                 {
-                    Offset = int.Parse(split[0]),
+                    Offset = double.Parse(split[0]),
                     MillisPerBeat = double.Parse(split[1]),
                     Meter = int.Parse(split[2]),
                     SampleSet = int.Parse(split[3]),
@@ -135,14 +152,17 @@ namespace RecordTheBeat.Parsing
             }
 
             IEnumerable<string> hitObjects = osuFileLines.SkipWhile(o => !o.ToLower().Contains("hitobjects"));
+
             foreach (string hitObject in hitObjects)
             {
                 if (string.IsNullOrWhiteSpace(hitObject) || hitObject[0] == '[') continue;
 
                 string[] split = hitObject.Split(',');
-                string[] extras = split.Last().Split(':');
 
-                HitObject ho = new HitObject
+                string splast = split.Last();
+                string[] extras = splast.Contains(":") ? splast.Split(':') : new string[5] { "0", "0", "0", "0", "" };
+
+                HitObject hobj = new HitObject
                 {
                     X = int.Parse(split[0]),
                     Y = int.Parse(split[1]),
@@ -159,17 +179,50 @@ namespace RecordTheBeat.Parsing
                     }
                 };
 
-                if(ho.ObjectType == HitObjectType.Circle)
+                if ((hobj.ObjectType & HitObjectType.Circle) == HitObjectType.Circle)
                 {
-                    HitCircles.Add((HitCircle)ho);
-                } else if(ho.ObjectType == HitObjectType.Spinner)
+                    HitCircles.Add(new HitCircle()
+                    {
+                        X = hobj.X,
+                        Y = hobj.Y,
+                        Time = hobj.Time,
+                        ObjectType = hobj.ObjectType,
+                        Hitsound = hobj.Hitsound,
+                        Extras = hobj.Extras
+                    });
+                }
+                else if ((hobj.ObjectType & HitObjectType.Spinner) == HitObjectType.Spinner)
                 {
-                    Spinner spinner = (Spinner)ho;
+                    Spinner spinner = new Spinner()
+                    {
+                        X = hobj.X,
+                        Y = hobj.Y,
+                        Time = hobj.Time,
+                        ObjectType = hobj.ObjectType,
+                        Hitsound = hobj.Hitsound,
+                        Extras = hobj.Extras
+                    };
+
                     spinner.EndTime = int.Parse(split[5]);
 
                     Spinners.Add(spinner);
-                } else if(ho.ObjectType == HitObjectType.Slider) {
-                    Slider slider = (Slider)ho;
+                }
+                else if ((hobj.ObjectType & HitObjectType.Slider) == HitObjectType.Slider)
+                {
+                    Slider slider = new Slider()
+                    {
+                        X = hobj.X,
+                        Y = hobj.Y,
+                        Time = hobj.Time,
+                        ObjectType = hobj.ObjectType,
+                        Hitsound = hobj.Hitsound,
+                        Extras = hobj.Extras,
+                        Points = new List<Vector2D>()
+                    };
+
+                    slider.Repeat = int.Parse(split[6]);
+                    slider.PixelLength = double.Parse(split[7]);
+
                     slider.Points.Add(new Vector2D(slider.X, slider.Y));
 
                     string[] sliderInfo = split[5].Split('|');
@@ -178,17 +231,20 @@ namespace RecordTheBeat.Parsing
                     slider.Type = type == "L" ? SliderType.Linear : (type == "P" ? SliderType.Perfect : (type == "B" ? SliderType.Bezier : SliderType.Catmull));
 
                     slider.CurvePoints = sliderInfo.Skip(1).Select(o => o.Split(':')).Select(o => new Vector2(int.Parse(o[0]), int.Parse(o[1])));
-                    
-                    if(slider.Type == SliderType.Linear)
+
+                    if (slider.Type == SliderType.Linear)
                     {
                         slider.Points.Add(slider.CurvePoints.First().ToDoublePair());
-                    } else if(slider.Type == SliderType.Perfect)
+                    }
+                    else if (slider.Type == SliderType.Perfect)
                     {
                         slider.Points.AddRange(PerfectCurve(slider));
-                    } else if (slider.Type == SliderType.Bezier)
+                    }
+                    else if (slider.Type == SliderType.Bezier)
                     {
                         slider.Points.AddRange(BezierCurve(slider));
-                    } else if (slider.Type == SliderType.Catmull)
+                    }
+                    else if (slider.Type == SliderType.Catmull)
                     {
                         slider.Points.AddRange(CatmullCurve(slider));
                     }
@@ -196,6 +252,25 @@ namespace RecordTheBeat.Parsing
                     Sliders.Add(slider);
                 }
             }
+
+            Process proc = new Process
+            {
+                StartInfo = new ProcessStartInfo("Utilities/oppai.exe", $"\"{osuFile}\" -ojson")
+                {
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                }
+            };
+
+            proc.Start();
+
+            string line = proc.StandardOutput.ReadLine();
+            var obj = JObject.Parse(line);
+            TotalPP = (double)obj.SelectToken("pp");
+            MaxCombo = (int)obj.SelectToken("max_combo");
+
+            FirstObject = Math.Min(Math.Min(Sliders.Count > 0 ? Sliders.First().Time : 9999, HitCircles.Count > 0 ? HitCircles.First().Time : 9999), Spinners.Count > 0 ? Spinners.First().Time : 9999);
         }
 
         public List<Vector2D> CatmullCurve(Slider slider) //Actual catmull calculations from https://github.com/SneakyBrian/Catmull-Rom-Sample
@@ -251,7 +326,7 @@ namespace RecordTheBeat.Parsing
                 Vector2 item = slider.CurvePoints.ElementAt(i);
                 buffer.Add(item);
 
-                if(curvePointsCount > i && item == slider.CurvePoints.ElementAt(i + 1))
+                if (curvePointsCount - 1 > i && item == slider.CurvePoints.ElementAt(i + 1))
                 {
                     realCurvePoints.Add(buffer);
                     buffer.Clear();
@@ -285,7 +360,7 @@ namespace RecordTheBeat.Parsing
 
         private List<Vector2D> PerfectCurve(Slider slider)
         {
-            if(slider.CurvePoints.Count() > 3)
+            if (slider.CurvePoints.Count() > 3)
                 return BezierCurve(slider);
 
             Vector2D a = new Vector2D(slider.X, slider.Y);
@@ -322,7 +397,7 @@ namespace RecordTheBeat.Parsing
             double thetaEnd = Math.Atan2(dC.Y, dC.X);
 
             List<Vector2D> points = new List<Vector2D>();
-            for(double theta = Math.Min(thetaStart, thetaEnd); theta < Math.Max(thetaStart, thetaEnd); theta += 1)
+            for (double theta = Math.Min(thetaStart, thetaEnd); theta < Math.Max(thetaStart, thetaEnd); theta += 1)
             {
                 points.Add(new Vector2D(Math.Cos(theta) * r, Math.Sin(theta)));
             }

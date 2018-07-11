@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,9 @@
   <ItemGroup>
     <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.9.0-preview1\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,12 +64,14 @@
     <Compile Include="Data\HitObjects\Slider.cs" />
     <Compile Include="Data\HitObjects\Spinner.cs" />
     <Compile Include="Data\HitObjects\TimingPoint.cs" />
+    <Compile Include="Ensure.cs" />
     <Compile Include="Enums\Gamemode.cs" />
     <Compile Include="Enums\HitObjects\HitObjectType.cs" />
     <Compile Include="Enums\HitObjects\HitSoundType.cs" />
     <Compile Include="Enums\HitObjects\SliderType.cs" />
     <Compile Include="Enums\KeyInfo.cs" />
     <Compile Include="Enums\Mods.cs" />
+    <Compile Include="GaussianBlur.cs" />
     <Compile Include="Parsing\Beatmap.cs" />
     <Compile Include="Parsing\Database.cs" />
     <Compile Include="Parsing\Parse.cs" />
