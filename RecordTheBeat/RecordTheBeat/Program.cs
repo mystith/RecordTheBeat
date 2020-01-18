@@ -1,6 +1,9 @@
 ﻿using System;
 using RecordTheBeat.Data;
+using RecordTheBeat.Parsing;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace RecordTheBeat
 {
@@ -8,8 +11,12 @@ namespace RecordTheBeat
     {
         static void Main(string[] args)
         {
+            //Create logging level switch to allow for logger level to be changed to what is inside config, after logger initialization
+            LoggingLevelSwitch lls = new LoggingLevelSwitch();
+            
+            //Initialize logger
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
+                .MinimumLevel.ControlledBy(lls)
                 .WriteTo.Console()
                 .WriteTo.File("logs/logfile.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
@@ -17,8 +24,14 @@ namespace RecordTheBeat
             Log.Debug("Starting up");
             Log.Debug("Shutting down");
             
-            ConfigLoader cfgloader = new ConfigLoader();
-            cfgloader.Load();
+            //Load config file
+            ConfigLoader cfgLoader = new ConfigLoader();
+            Configuration cfg = cfgLoader.Load();
+
+            //Change logger depth to that stated in config
+            lls.MinimumLevel = cfg.LogDepth;
+
+            DatabaseMeta dm = new DatabaseParser().Parse(@"C:\Users\mystith\AppData\Local\osu!\osu!.db");
         }
     }
 }

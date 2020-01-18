@@ -2,7 +2,7 @@
 
 namespace RecordTheBeat.Data
 {
-    public class Movement
+    public struct Movement
     {
         public long TimeSince { get; set; }
         public float X { get; set; }

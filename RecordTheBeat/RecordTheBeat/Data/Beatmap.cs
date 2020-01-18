@@ -6,7 +6,7 @@ using RecordTheBeat.Enums;
 
 namespace RecordTheBeat.Data
 {
-    public class Beatmap
+    public struct Beatmap
     {
         #region General
         public string AudioFilename { get; }

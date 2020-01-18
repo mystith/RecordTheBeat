@@ -1,8 +1,8 @@
 ﻿namespace RecordTheBeat.Data
 {
-    public class HPValue
+    public struct HPValue
     {
-        public int TimeMillis { get; set; }
+        public int Time { get; set; } //in ms
         public float Value { get; set; }
     }
 }

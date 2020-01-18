@@ -1,6 +1,6 @@
 ﻿namespace RecordTheBeat.Data.HitObjects
 {
-    public class HitsoundExtras
+    public struct HitsoundExtras
     {
         public int SampleSet { get; set; }
         public int AdditionSet { get; set; }

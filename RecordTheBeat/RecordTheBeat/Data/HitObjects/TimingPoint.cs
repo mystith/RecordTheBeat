@@ -1,8 +1,9 @@
 ﻿namespace RecordTheBeat.Data.HitObjects
 {
-    public class TimingPoint
+    public struct TimingPoint
     {
         public double Offset { get; set; }
+        public double BPM { get; set; }
         public double MillisPerBeat { get; set; }
         public int Meter { get; set; }
         public int SampleSet { get; set; }

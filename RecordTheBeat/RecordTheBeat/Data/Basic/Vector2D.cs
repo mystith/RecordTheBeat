@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RecordTheBeat.Data.Basic
 {
-    public class Vector2D
+    public struct Vector2D
     {
         public double X { get; set; }
         public double Y { get; set; }

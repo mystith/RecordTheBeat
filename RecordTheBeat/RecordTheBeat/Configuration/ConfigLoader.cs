@@ -17,6 +17,8 @@ namespace RecordTheBeat.Data
         public Configuration Load()
         {
             Configuration result;
+            
+            //Check if config.yaml exists
             if (!File.Exists("config.yaml"))
             {
                 Log.Error("Config file not found, using default settings.");

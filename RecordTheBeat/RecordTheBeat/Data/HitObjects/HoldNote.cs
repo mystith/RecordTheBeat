@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RecordTheBeat.Data.HitObjects
 {
-    public class HoldNote
+    public struct HoldNote
     {
         public int EndTime { get; set; }
     }
