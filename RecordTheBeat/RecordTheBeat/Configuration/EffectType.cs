@@ -1,4 +1,4 @@
-﻿namespace RecordTheBeat.Data
+﻿namespace RecordTheBeat.Configuration
 {
     public enum EffectType
     {

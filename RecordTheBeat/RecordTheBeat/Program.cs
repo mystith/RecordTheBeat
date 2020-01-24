@@ -1,6 +1,7 @@
 ﻿using System;
-using RecordTheBeat.Data;
-using RecordTheBeat.Parsing;
+using CircleHelper.Data;
+using CircleHelper.Parsing;
+using RecordTheBeat.Configuration;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -26,7 +27,7 @@ namespace RecordTheBeat
             
             //Load config file
             ConfigLoader cfgLoader = new ConfigLoader();
-            Configuration cfg = cfgLoader.Load();
+            Config cfg = cfgLoader.Load();
 
             //Change logger depth to that stated in config
             lls.MinimumLevel = cfg.LogDepth;

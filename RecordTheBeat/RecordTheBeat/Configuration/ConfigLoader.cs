@@ -2,7 +2,7 @@
 using Serilog;
 using YamlDotNet.Serialization;
 
-namespace RecordTheBeat.Data
+namespace RecordTheBeat.Configuration
 {
     public class ConfigLoader
     {
@@ -14,16 +14,16 @@ namespace RecordTheBeat.Data
             serialize = new Serializer();
             deserialize = new Deserializer();
         }
-        public Configuration Load()
+        public Config Load()
         {
-            Configuration result;
+            Config result;
             
             //Check if config.yaml exists
             if (!File.Exists("config.yaml"))
             {
                 Log.Error("Config file not found, using default settings.");
                 
-                result = new Configuration();
+                result = new Config();
 
                 Save(result);
                 
@@ -32,13 +32,13 @@ namespace RecordTheBeat.Data
 
             string config = File.ReadAllText("config.yaml");
 
-            result = deserialize.Deserialize<Configuration>(config);
+            result = deserialize.Deserialize<Config>(config);
             Log.Debug("Deserialized config file");
             
             return result;
         }
         
-        public void Save(Configuration config)
+        public void Save(Config config)
         {
             string cfgtext = serialize.Serialize(config);
             File.WriteAllText("config.yaml", cfgtext);

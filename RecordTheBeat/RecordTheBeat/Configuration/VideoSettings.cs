@@ -1,4 +1,4 @@
-﻿namespace RecordTheBeat.Data
+﻿namespace RecordTheBeat.Configuration
 {
     public class VideoSettings
     {
@@ -13,6 +13,7 @@
         
         public string AdditionalArgs { get; set; }
 
+        public string CommandOverride { get; set; }
         public VideoSettings()
         {
             Width = 1920;
@@ -24,6 +25,8 @@
 
             ExportPath = "final.mp4";
             AdditionalArgs = "";
+
+            CommandOverride = "";
         }
     }
 }
