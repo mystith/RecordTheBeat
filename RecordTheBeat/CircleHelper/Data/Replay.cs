@@ -19,6 +19,8 @@ namespace CircleHelper.Data
         public short MaxCombo { get; set; }
         public bool PerfectCombo { get; set; }
         public Mods ModsUsed { get; set; }
-        
+
+        public Movement[] CursorData { get; set; }
+        public HPValue[] HPData { get; set; }
     }
 }

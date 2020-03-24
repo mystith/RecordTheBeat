@@ -15,7 +15,7 @@ namespace CircleHelper.Parsing
     {
         public DatabaseMeta Parse(string filename)
         {
-            Log.Error("Loading database file {0}", filename);
+            Log.Information("Loading database file {0}", filename);
             List<BeatmapMeta> beatmaps = new List<BeatmapMeta>();
 
             if (!File.Exists(filename))
