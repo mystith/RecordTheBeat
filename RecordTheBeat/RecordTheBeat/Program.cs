@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CircleHelper.Data;
 using CircleHelper.Parsing;
 using RecordTheBeat.Configuration;
@@ -31,8 +32,20 @@ namespace RecordTheBeat
 
             //Change logger depth to that stated in config
             lls.MinimumLevel = cfg.LogDepth;
+            
+            DatabaseMeta dm = DatabaseParser.Parse(cfg.DatabasePath);
 
-            DatabaseMeta dm = new DatabaseParser().Parse(@"C:\Users\mystith\AppData\Local\osu!\osu!.db");
+            string file = "";
+            
+            while(!File.Exists(file)){
+                Log.Information("Drag and drop the replay file, or input the file path: ");
+                file = Console.ReadLine();
+                
+                if(!File.Exists(file)) Log.Error("File not found.");
+            }
+            
+            Replay r = ReplayParser.Parse(file);
+            
         }
     }
 }

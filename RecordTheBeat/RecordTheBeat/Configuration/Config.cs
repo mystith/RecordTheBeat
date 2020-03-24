@@ -1,4 +1,5 @@
-﻿using Serilog.Events;
+﻿using System;
+using Serilog.Events;
 
 namespace RecordTheBeat.Configuration
 {
@@ -9,6 +10,7 @@ namespace RecordTheBeat.Configuration
         
         public string TitleScreen { get; private set; }
         public LogEventLevel LogDepth { get; private set; }
+        public string DatabasePath { get; private set; }
 
         public Config()
         {
@@ -16,6 +18,7 @@ namespace RecordTheBeat.Configuration
             GameConfig = new GameSettings();
             LogDepth = LogEventLevel.Information;
             TitleScreen = "";
+            DatabasePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "Local\\osu!\\osu!.db");
         }
     }
 }

@@ -11,9 +11,9 @@ using Serilog;
 
 namespace CircleHelper.Parsing
 {
-    public class DatabaseParser
+    public static class DatabaseParser
     {
-        public DatabaseMeta Parse(string filename)
+        public static DatabaseMeta Parse(string filename)
         {
             Log.Information("Loading database file {0}", filename);
             List<BeatmapMeta> beatmaps = new List<BeatmapMeta>();
@@ -21,7 +21,7 @@ namespace CircleHelper.Parsing
             if (!File.Exists(filename))
             {
                 Log.Error("Database file not found");
-                return null;
+                throw new FileNotFoundException("Database file not found");
             }
             
             DatabaseMeta database = new DatabaseMeta();
@@ -129,7 +129,7 @@ namespace CircleHelper.Parsing
             return database;
         }
 
-        private IEnumerable<TimingPoint> ReadTimingPoints(BinaryReader br)
+        private static IEnumerable<TimingPoint> ReadTimingPoints(BinaryReader br)
         {
             List<TimingPoint> points = new List<TimingPoint>();
             
@@ -149,7 +149,7 @@ namespace CircleHelper.Parsing
             return points;
         }
 
-        private IEnumerable<(int Mod, double StarRating)> ReadStarRatings(BinaryReader br)
+        private static IEnumerable<(int Mod, double StarRating)> ReadStarRatings(BinaryReader br)
         {
             var result = new List<(int Mod, double StarRating)>();
             
@@ -169,7 +169,7 @@ namespace CircleHelper.Parsing
             return result;
         }
 
-        public string ReadString(BinaryReader br)
+        private static string ReadString(BinaryReader br)
         {
             byte initial = br.ReadByte(); //a single byte which will be either 0x00, indicating that the next two parts are not present, or 0x0b (decimal 11), indicating that the next two parts are present. If it is 0x0b, there will then be a ULEB128, representing the byte length of the following string, and then the string itself, encoded in UTF-8.
             int byteLength = 0;

@@ -1,6 +1,6 @@
 ﻿namespace CircleHelper.Parsing
 {
-    public class BeatmapParser
+    public static class BeatmapParser
     {
         
     }
