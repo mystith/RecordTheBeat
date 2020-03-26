@@ -7,7 +7,8 @@ using CircleHelper.Enums;
 
 namespace CircleHelper.Data
 {
-    public struct BeatmapMeta
+    //Holds beatmap information contained within the .db file
+    public class BeatmapMeta
     {
         public int Size { get; set; }
         
@@ -36,10 +37,10 @@ namespace CircleHelper.Data
         
         public double SliderVelocity { get; set; }
         
-        public IEnumerable<(int Mod, double StarRating)> STDModSR { get; set; }
-        public IEnumerable<(int Mod, double StarRating)> TaikoModSR { get; set; }
-        public IEnumerable<(int Mod, double StarRating)> CTBModSR { get; set; }
-        public IEnumerable<(int Mod, double StarRating)> ManiaModSR { get; set; }
+        public IEnumerable<StarRating> STDModSR { get; set; }
+        public IEnumerable<StarRating> TaikoModSR { get; set; }
+        public IEnumerable<StarRating> CTBModSR { get; set; }
+        public IEnumerable<StarRating> ManiaModSR { get; set; }
         
         public int DrainTime { get; set; }
         public int TotalTime { get; set; }

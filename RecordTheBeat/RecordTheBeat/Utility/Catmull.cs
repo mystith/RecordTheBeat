@@ -1,4 +1,4 @@
-﻿namespace CircleHelper.Utility
+﻿namespace RecordTheBeat.Utility
 {
     public class Catmull
     {

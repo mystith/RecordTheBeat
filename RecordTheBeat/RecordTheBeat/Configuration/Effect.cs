@@ -1,6 +1,6 @@
 ﻿namespace RecordTheBeat.Configuration
 {
-    public struct Effect
+    public class Effect
     {
         
     }

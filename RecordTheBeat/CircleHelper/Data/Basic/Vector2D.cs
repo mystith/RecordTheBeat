@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CircleHelper.Data.Basic
 {
-    public struct Vector2D
+    public class Vector2D
     {
         public double X { get; set; }
         public double Y { get; set; }

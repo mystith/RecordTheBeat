@@ -1,6 +1,6 @@
 ﻿namespace CircleHelper.Data.HitObjects
 {
-    public struct HitsoundExtras
+    public class HitsoundExtras
     {
         public int SampleSet { get; set; }
         public int AdditionSet { get; set; }

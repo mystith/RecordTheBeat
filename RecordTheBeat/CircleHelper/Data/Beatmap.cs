@@ -6,63 +6,76 @@ using CircleHelper.Enums;
 
 namespace CircleHelper.Data
 {
-    public struct Beatmap
+    //Holds beatmap information contained within the .osu file
+    public class Beatmap
     {
         #region General
-        public string AudioFilename { get; }
-        public int AudioLeadIn { get; }
-        public int PreviewTime { get; }
-        public bool Countdown { get; }
-        public string SampleSet { get; }
-        public double StackLeniency { get; }
-        public GameMode Mode { get; }
-        public bool LetterboxInBreaks { get; }
-        public bool WidescreenStoryboard { get; }
-        public bool StoryFireInFront { get; }
-        public bool SpecialStyle { get; }
-        public bool EpilepsyWarning { get; }
-        public bool UseSkinSprites { get; }
+        public string AudioFilename { get; set; }
+        public int AudioLeadIn { get; set; }
+        public string AudioHash { get; set; }
+        public int PreviewTime { get; set; }
+        public CountdownSpeed Countdown { get; set; }
+        public string SampleSet { get; set; }
+        public double StackLeniency { get; set; }
+        public GameMode Mode { get; set; }
+        public bool LetterboxInBreaks { get; set; }
+        public bool WidescreenStoryboard { get; set; }
+        public bool StoryFireInFront { get; set; }
+        public bool SpecialStyle { get; set; }
+        public bool EpilepsyWarning { get; set; }
+        public bool UseSkinSprites { get; set; }
+        public bool AlwaysShowPlayfield { get; set; }
+        public string OverlayPosition { get; set; }
+        public string SkinPreference { get; set; }
+        public int CountdownOffset { get; set; }
+        public bool SamplesMatchPlaybackRate { get; set; }
+        #endregion
+        #region Editing
+        public int[] Bookmarks { get; set; }
+        public double DistanceSpacing { get; set; }
+        public double BeatDivisor { get; set; }
+        public int GridSize { get; set; }
+        public double TimelineZoom { get; set; }
         #endregion
         #region Metadata
-        public string Title { get; }
-        public string TitleUnicode { get; }
-        public string Artist { get; }
-        public string ArtistUnicode { get; }
-        public string Creator { get; }
-        public string Version { get; }
-        public string Source { get; }
-        public List<string> Tags { get; }
-        public int BeatmapID { get; }
-        public int BeatmapSetID { get; }
+        public string Title { get; set; }
+        public string TitleUnicode { get; set; }
+        public string Artist { get; set; }
+        public string ArtistUnicode { get; set; }
+        public string Creator { get; set; }
+        public string Version { get; set; }
+        public string Source { get; set; }
+        public string[] Tags { get; set; }
+        public int BeatmapID { get; set; }
+        public int BeatmapSetID { get; set; }
         #endregion
         #region Difficulty
-        public double HPDrainRate { get; }
-        public double CircleSize { get; }
-        public double OverallDifficulty { get; }
-        public double ApproachRate { get; }
-        public double SliderMultiplier { get; }
-        public double SliderTickRate { get; }
+        public double HPDrainRate { get; set; }
+        public double CircleSize { get; set; }
+        public double OverallDifficulty { get; set; }
+        public double ApproachRate { get; set; }
+        public double SliderMultiplier { get; set; }
+        public double SliderTickRate { get; set; }
         #endregion
         #region Events
-        public string Background { get; }
-        public List<Vector2> Breaks { get; }
+        public string Background { get; set; }
+        public IEnumerable<Break> Breaks { get; set; }
         #endregion
         #region Colors
-        public List<Color> ComboColors { get; }
-        public Color SliderBody { get; }
-        public Color SliderTrackOverride { get; }
-        public Color SliderBorder { get; }
+        public IEnumerable<Color> ComboColors { get; set; }
+        public Color SliderTrackOverride { get; set; }
+        public Color SliderBorder { get; set; }
         #endregion
         #region Game
-        public List<TimingPoint> TimingPoints { get; }
-        public List<HitCircle> HitCircles { get; }
-        public List<Slider> Sliders { get; }
-        public List<Spinner> Spinners { get; }
+        public IEnumerable<TimingPoint> TimingPoints { get; set; }
+        public IEnumerable<HitCircle> HitCircles { get; set; }
+        public IEnumerable<Slider> Sliders { get; set; }
+        public IEnumerable<Spinner> Spinners { get; set; }
 
-        public int MaxCombo { get; }
-        public int FirstObject { get; }
+        public int MaxCombo { get; set; }
+        public int FirstObject { get; set; }
 
-        public double TotalPP { get; }
+        public double TotalPP { get; set; }
         #endregion
     }
 }

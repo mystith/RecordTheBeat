@@ -2,7 +2,7 @@
 
 namespace CircleHelper.Data
 {
-    public struct Movement
+    public class Movement
     {
         public long Time { get; set; }
         public float X { get; set; }

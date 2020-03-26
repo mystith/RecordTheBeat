@@ -1,8 +1,10 @@
-﻿namespace CircleHelper.Data.HitObjects
+﻿using CircleHelper.Enums;
+
+namespace CircleHelper.Data.HitObjects
 {
-    public struct TimingPoint
+    public class TimingPoint
     {
-        public double Offset { get; set; }
+        public int Time { get; set; }
         public double BPM { get; set; }
         public double MillisPerBeat { get; set; }
         public int Meter { get; set; }
@@ -10,6 +12,6 @@
         public int SampleIndex { get; set; }
         public int Volume { get; set; }
         public bool Inherited { get; set; }
-        public bool Kiai { get; set; }
+        public TimingEffect Effects { get; set; }
     }
 }

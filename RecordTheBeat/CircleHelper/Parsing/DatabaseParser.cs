@@ -139,7 +139,7 @@ namespace CircleHelper.Parsing
                 TimingPoint tp = new TimingPoint
                 {
                     BPM = br.ReadDouble(), 
-                    Offset = br.ReadDouble(), 
+                    Time = (int)br.ReadDouble(), 
                     Inherited = !br.ReadBoolean()
                 };
                 
@@ -149,19 +149,19 @@ namespace CircleHelper.Parsing
             return points;
         }
 
-        private static IEnumerable<(int Mod, double StarRating)> ReadStarRatings(BinaryReader br)
+        private static IEnumerable<StarRating> ReadStarRatings(BinaryReader br)
         {
-            var result = new List<(int Mod, double StarRating)>();
+            var result = new List<StarRating>();
             
             int count = br.ReadInt32();
 
             for (int i = 0; i < count; i++)
             {
-                (int Mod, double StarRating) msr = (0, 0);
+                StarRating msr = new StarRating();
                 br.BaseStream.Position++; //skip byte that signifies its an int
-                msr.Mod = br.ReadInt32();
+                msr.ModSelection = (Mods)br.ReadInt32();
                 br.BaseStream.Position++; //skip byte that signifies its a double
-                msr.StarRating = br.ReadDouble();
+                msr.Star = br.ReadDouble();
                 
                 result.Add(msr);
             }

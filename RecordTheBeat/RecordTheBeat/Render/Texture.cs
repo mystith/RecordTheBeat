@@ -1,6 +1,6 @@
 ﻿namespace RecordTheBeat.Render
 {
-    public struct Texture
+    public class Texture
     {
         public string Name { get; set; }
     }
