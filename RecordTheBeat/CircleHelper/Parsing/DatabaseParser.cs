@@ -13,7 +13,7 @@ namespace CircleHelper.Parsing
 {
     public static class DatabaseParser
     {
-        public static DatabaseMeta Parse(string filename)
+        public static Database Parse(string filename)
         {
             Log.Information("Loading database file {0}", filename);
             List<BeatmapMeta> beatmaps = new List<BeatmapMeta>();
@@ -24,7 +24,7 @@ namespace CircleHelper.Parsing
                 throw new FileNotFoundException("Database file not found");
             }
             
-            DatabaseMeta database = new DatabaseMeta();
+            Database database = new Database();
             
             byte[] fileBytes = File.ReadAllBytes(filename);
             using (MemoryStream memoryStr = new MemoryStream(fileBytes))
@@ -129,7 +129,7 @@ namespace CircleHelper.Parsing
             return database;
         }
 
-        private static IEnumerable<TimingPoint> ReadTimingPoints(BinaryReader br)
+        private static List<TimingPoint> ReadTimingPoints(BinaryReader br)
         {
             List<TimingPoint> points = new List<TimingPoint>();
             
@@ -149,21 +149,20 @@ namespace CircleHelper.Parsing
             return points;
         }
 
-        private static IEnumerable<StarRating> ReadStarRatings(BinaryReader br)
+        private static Dictionary<Mods, double> ReadStarRatings(BinaryReader br)
         {
-            var result = new List<StarRating>();
+            Dictionary<Mods, double> result = new Dictionary<Mods, double>();
             
             int count = br.ReadInt32();
 
             for (int i = 0; i < count; i++)
             {
-                StarRating msr = new StarRating();
                 br.BaseStream.Position++; //skip byte that signifies its an int
-                msr.ModSelection = (Mods)br.ReadInt32();
+                Mods selection = (Mods)br.ReadInt32();
                 br.BaseStream.Position++; //skip byte that signifies its a double
-                msr.Star = br.ReadDouble();
+                double starRating = br.ReadDouble();
                 
-                result.Add(msr);
+                result.Add(selection, starRating);
             }
 
             return result;

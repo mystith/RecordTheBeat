@@ -7,10 +7,10 @@ namespace RecordTheBeat.Utility
 {
     public class Bezier
     {
-        public static IEnumerable<PointF> BezierLineDistributed(PointF[] anchors, int resolution) //bezier line with equally distributed points
+        public static List<PointF> BezierCurveDistributed(PointF[] anchors, int resolution, float accuracy) //bezier line with equally distributed points
         {
             //calculate initial bezier curve
-            PointF[] curve = BezierLine(anchors, resolution);
+            PointF[] curve = BezierCurve(anchors, resolution);
             Dictionary<PointF, float> points = new Dictionary<PointF, float>();
             
             //calculate length of curve at each point, store largest segment (final point will be added later)
@@ -40,14 +40,23 @@ namespace RecordTheBeat.Utility
                 double least = double.MaxValue;
                 PointF closest = new PointF();
                 
-                //find the point with the least difference between the distributed length at the point and the curve's total length at that point
-                foreach(var point in points)
+                //find the point with the least difference between the length at the point on the curve and what the length at the point on the curve should be, if distributed perfectly
+                //linear interpolation is used to get a more accurate answer, but is optional (set accuracy to 1)
+                for(int j = 0; j < points.Count - 1; j++)
                 {
-                    double distance = Dist(point.Value, curveLength / (curve.Length - 1) * i);
-                    if (distance < least)
+                    var a = points.ElementAt(j);
+                    var b = points.ElementAt(j + 1);
+
+                    for (float k = 0; k <= 1; k += accuracy)
                     {
-                        least = distance;
-                        closest = point.Key;
+                        float len = Lerp(a.Value, b.Value, k);
+                        float dist = Dist(len, curveLength / (curve.Length - 1) * i);
+                        
+                        if (dist < least)
+                        {
+                            least = dist;
+                            closest = Lerp(a.Key, b.Key, k);
+                        }
                     }
                 }
                 
@@ -57,17 +66,7 @@ namespace RecordTheBeat.Utility
             return newCurve;
         }
 
-        private static float Dist(float a, float b)
-        {
-            return Math.Abs(b - a);
-        }
-        
-        private static float Dist(PointF a, PointF b)
-        {
-            return (float)Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
-        }
-
-        private static PointF[] BezierLine(PointF[] points, int resolution)
+        private static PointF[] BezierCurve(PointF[] points, int resolution)
         {
             PointF[] output = new PointF[resolution];
 
@@ -100,6 +99,16 @@ namespace RecordTheBeat.Utility
             }
 
             return currentSet[0];
+        }
+        
+        private static float Dist(float a, float b)
+        {
+            return Math.Abs(b - a);
+        }
+        
+        private static float Dist(PointF a, PointF b)
+        {
+            return (float)Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
         }
         
         private static float Lerp(float a, float b, float t)

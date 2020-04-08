@@ -59,18 +59,18 @@ namespace CircleHelper.Data
         #endregion
         #region Events
         public string Background { get; set; }
-        public IEnumerable<Break> Breaks { get; set; }
+        public List<Break> Breaks { get; set; }
         #endregion
         #region Colors
-        public IEnumerable<Color> ComboColors { get; set; }
+        public List<Color> ComboColors { get; set; }
         public Color SliderTrackOverride { get; set; }
         public Color SliderBorder { get; set; }
         #endregion
         #region Game
-        public IEnumerable<TimingPoint> TimingPoints { get; set; }
-        public IEnumerable<HitCircle> HitCircles { get; set; }
-        public IEnumerable<Slider> Sliders { get; set; }
-        public IEnumerable<Spinner> Spinners { get; set; }
+        public List<TimingPoint> TimingPoints { get; set; }
+        public List<HitCircle> HitCircles { get; set; }
+        public List<Slider> Sliders { get; set; }
+        public List<Spinner> Spinners { get; set; }
 
         public int MaxCombo { get; set; }
         public int FirstObject { get; set; }

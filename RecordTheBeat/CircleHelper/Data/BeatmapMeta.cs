@@ -37,17 +37,17 @@ namespace CircleHelper.Data
         
         public double SliderVelocity { get; set; }
         
-        public IEnumerable<StarRating> STDModSR { get; set; }
-        public IEnumerable<StarRating> TaikoModSR { get; set; }
-        public IEnumerable<StarRating> CTBModSR { get; set; }
-        public IEnumerable<StarRating> ManiaModSR { get; set; }
+        public Dictionary<Mods, double> STDModSR { get; set; }
+        public Dictionary<Mods, double> TaikoModSR { get; set; }
+        public Dictionary<Mods, double> CTBModSR { get; set; }
+        public Dictionary<Mods, double> ManiaModSR { get; set; }
         
         public int DrainTime { get; set; }
         public int TotalTime { get; set; }
         
         public int AudioPreviewTime { get; set; }
         
-        public IEnumerable<TimingPoint> TimingPoints { get; set; }
+        public List<TimingPoint> TimingPoints { get; set; }
         
         public int BeatmapID { get; set; }
         public int BeatmapSetID { get; set; }

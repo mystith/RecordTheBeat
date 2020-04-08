@@ -7,6 +7,7 @@ using System.Numerics;
 using CircleHelper.Data;
 using CircleHelper.Data.HitObjects;
 using CircleHelper.Enums;
+using CircleHelper.Enums.HitObjects;
 using Serilog;
 
 namespace CircleHelper.Parsing
@@ -130,6 +131,7 @@ namespace CircleHelper.Parsing
 
                 if (string.IsNullOrWhiteSpace(line))
                 {
+                    map.ComboColors = colors;
                     return;
                 }
 
@@ -162,12 +164,82 @@ namespace CircleHelper.Parsing
         
         private static void ParseHitObjects(StringReader sr, ref Beatmap map)
         {
+            List<HitCircle> circles = new List<HitCircle>();
+            List<Slider> sliders = new List<Slider>();
+            List<Spinner> spinners = new List<Spinner>();
+            
             while (true)
             {
                 string line = sr.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(line))
+                {
+                    map.HitCircles = circles;
+                    map.Sliders = sliders;
+                    map.Spinners = spinners;
                     return;
+                }
+                
+                string[] parts = line.Split(',');
+                HitObject ho = new HitObject()
+                {
+                    X = int.Parse(parts[0]),
+                    Y = int.Parse(parts[1]),
+                    Time = int.Parse(parts[2]),
+                    ObjectType = (HitObjectType)int.Parse(parts[3]),
+                    Hitsound = (HitSoundType)int.Parse(parts[4])
+                };
+                //ho.
+
+                if ((ho.ObjectType & HitObjectType.Circle) != 0)
+                {
+                    circles.Add((HitCircle)ho);
+                }
+                else if ((ho.ObjectType & HitObjectType.Slider) != 0)
+                {
+                    Slider slider = (Slider) ho;
+                    string[] pointData = parts[5].Split('|');
+
+                    switch (pointData[0][0]) //Gets first character of first part of pointData, aka the character signalling the type of slider
+                    {
+                        case 'B': slider.Type = SliderType.Bezier; break;
+                        case 'P': slider.Type = SliderType.Perfect; break;
+                        case 'L': slider.Type = SliderType.Linear; break;
+                        case 'C': slider.Type = SliderType.Catmull; break;
+                    }
+
+                    for (int i = 1; i < pointData.Length; i++)
+                    {
+                        string[] point = pointData[i].Split(':');
+                        
+                        Vector2 v = new Vector2(float.Parse(point[0]),float.Parse(point[1]));
+                    }
+
+                    slider.Repeat = int.Parse(parts[6]);
+                    slider.PixelLength = double.Parse(parts[7]);
+                    slider.EdgeHitsounds = parts[8].Split('|').Select(o => (HitSoundType) int.Parse(o)).ToList();
+                    
+                    slider.EdgeAdditions = new List<HitSoundSample>();
+                    
+                    foreach (string sample in parts[9].Split('|'))
+                    {
+                        string[] sets = sample.Split(':');
+                        slider.EdgeAdditions.Add(new HitSoundSample()
+                        {
+                            SampleSet = (SampleSet)int.Parse(sets[0]),
+                            AdditionSet = (SampleSet)int.Parse(sets[1])
+                        });
+                    }
+                    
+                    sliders.Add(slider);
+                } 
+                else if ((ho.ObjectType & HitObjectType.Spinner) != 0)
+                {
+                    Spinner s = (Spinner)ho;
+                    s.EndTime = int.Parse(parts[5]);
+                    
+                    spinners.Add(s);
+                }
             }
         }
 

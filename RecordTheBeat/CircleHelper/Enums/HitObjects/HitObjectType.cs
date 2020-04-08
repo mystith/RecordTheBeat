@@ -12,6 +12,6 @@ namespace CircleHelper.Enums.HitObjects
         Bit4 = 16,
         Bit5 = 32,
         Bit6 = 64,
-        HoldNode = 128
+        HoldNote = 128
     }
 }

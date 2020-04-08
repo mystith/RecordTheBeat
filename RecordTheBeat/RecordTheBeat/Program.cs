@@ -33,7 +33,7 @@ namespace RecordTheBeat
             //Change logger depth to that stated in config
             lls.MinimumLevel = cfg.LogDepth;
             
-            DatabaseMeta dm = DatabaseParser.Parse(cfg.DatabasePath);
+            Database dm = DatabaseParser.Parse(cfg.DatabasePath);
 
             string file = "";
             

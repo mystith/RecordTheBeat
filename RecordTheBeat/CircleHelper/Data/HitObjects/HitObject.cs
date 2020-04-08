@@ -13,6 +13,6 @@ namespace CircleHelper.Data.HitObjects
 
         public HitSoundType Hitsound { get; set; }
 
-        public HitsoundExtras Extras { get; set; }
+        public HitSoundExtras Extras { get; set; }
     }
 }
