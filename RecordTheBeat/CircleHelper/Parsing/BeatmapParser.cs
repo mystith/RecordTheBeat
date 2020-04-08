@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using CircleHelper.Data;
+using CircleHelper.Data.Basic;
 using CircleHelper.Data.HitObjects;
 using CircleHelper.Enums;
 using CircleHelper.Enums.HitObjects;
+using CircleHelper.Utility;
 using Serilog;
 
 namespace CircleHelper.Parsing
@@ -200,27 +201,43 @@ namespace CircleHelper.Parsing
                     Slider slider = (Slider) ho;
                     string[] pointData = parts[5].Split('|');
 
-                    switch (pointData[0][0]) //Gets first character of first part of pointData, aka the character signalling the type of slider
-                    {
-                        case 'B': slider.Type = SliderType.Bezier; break;
-                        case 'P': slider.Type = SliderType.Perfect; break;
-                        case 'L': slider.Type = SliderType.Linear; break;
-                        case 'C': slider.Type = SliderType.Catmull; break;
-                    }
-
+                    slider.CurveAnchors = new Vector2D[pointData.Length - 1];
                     for (int i = 1; i < pointData.Length; i++)
                     {
                         string[] point = pointData[i].Split(':');
-                        
-                        Vector2 v = new Vector2(float.Parse(point[0]),float.Parse(point[1]));
+                        slider.CurveAnchors[i - 1] = new Vector2D(double.Parse(point[0]), double.Parse(point[1]));
+                    }
+                    
+                    switch (pointData[0][0]) //Gets first character of first part of pointData, aka the character signalling the type of slider
+                    {
+                        case 'B': 
+                            slider.Type = SliderType.Bezier;
+                            slider.CurvePoints = Bezier.BezierCurveDistributed(slider.CurveAnchors, 500, 0.01); 
+                            break;
+                        case 'P': 
+                            slider.Type = SliderType.Perfect;
+                            slider.CurvePoints = Perfect.CircularCurve(slider.CurveAnchors, 500); 
+                            break;
+                        case 'L': 
+                            slider.Type = SliderType.Linear;
+                            slider.CurvePoints = Linear.LinearLine(slider.CurveAnchors, 500); 
+                            break;
+                        case 'C': 
+                            slider.Type = SliderType.Catmull;
+                            slider.CurvePoints = Catmull.CatmullCurveDistributed(slider.CurveAnchors, 500, 0.01); 
+                            break;
                     }
 
                     slider.Repeat = int.Parse(parts[6]);
                     slider.PixelLength = double.Parse(parts[7]);
-                    slider.EdgeHitsounds = parts[8].Split('|').Select(o => (HitSoundType) int.Parse(o)).ToList();
+                    
+                    slider.EdgeHitsounds = new List<HitSoundType>();
+                    foreach (string str in parts[8].Split('|'))
+                    {
+                        slider.EdgeHitsounds.Add((HitSoundType)int.Parse(str));
+                    }
                     
                     slider.EdgeAdditions = new List<HitSoundSample>();
-                    
                     foreach (string sample in parts[9].Split('|'))
                     {
                         string[] sets = sample.Split(':');

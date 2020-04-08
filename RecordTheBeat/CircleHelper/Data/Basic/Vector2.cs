@@ -4,6 +4,12 @@
     {
         public int X { get; set; }
         public int Y { get; set; }
+        
+        public Vector2()
+        {
+            this.X = 0;
+            this.Y = 0;
+        }
 
         public Vector2(int A, int B)
         {

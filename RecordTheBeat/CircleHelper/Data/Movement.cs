@@ -5,8 +5,8 @@ namespace CircleHelper.Data
     public class Movement
     {
         public long Time { get; set; }
-        public float X { get; set; }
-        public float Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public KeyInfo KeysPressed { get; set; }
     }
 }

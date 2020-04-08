@@ -10,6 +10,12 @@ namespace CircleHelper.Data.Basic
     {
         public double X { get; set; }
         public double Y { get; set; }
+        
+        public Vector2D()
+        {
+            this.X = 0;
+            this.Y = 0;
+        }
 
         public Vector2D(double A, double B)
         {

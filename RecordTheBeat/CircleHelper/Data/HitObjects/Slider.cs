@@ -7,7 +7,8 @@ namespace CircleHelper.Data.HitObjects
     public class Slider : HitObject
     {
         public SliderType Type { get; set; }
-        public List<Vector2> CurvePoints { get; set; }
+        public Vector2D[] CurveAnchors { get; set; }
+        public Vector2D[] CurvePoints { get; set; }
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
         public List<HitSoundType> EdgeHitsounds { get; set; }
